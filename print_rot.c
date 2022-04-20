@@ -1,48 +1,41 @@
-#include <stdarg.h>
-#include <stdlib.h>
 #include "main.h"
 
 /**
-  * print_rot - function to convert a string encoded by rot13
-  * @format: copy of format string pointed to %s
-  * @var: va_list pointer
-  * Return: if string is NULL, return pointer
-  */
-char *print_rot(char *format, va_list *var)
+ * print_rot - writes the str in ROT13
+ * @arguments: input string
+ * @buf: buffer pointer
+ * @ibuf: index for buffer pointer
+ * Return: number of chars printed.
+ */
+
+int print_rot(va_list arguments, char *buf, unsigned int ibuf)
 {
-	char *formatEnd, *argStr;
-	char *alpha = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ";
-	char *code = "nNoOpPqQrRsStTuUvVwWxXyYzZaAbBcCdDeEfFgGhHiIjJkKlLmM";
-	int i, j = 0;
+	char alf[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	char rot[] = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm";
+	char *str;
+	unsigned int i, j, k;
+	char nill[] = "(avyy)";
 
-	argStr = va_arg(*var, char *);
-	if (argStr == NULL || *argStr == '\0')
-		return (NULL);
-
-	formatEnd = malloc(sizeof(*formatEnd) * (_strlen(format) + 1));
-	if (formatEnd == NULL)
-		return (NULL);
-	_strcpy(formatEnd, format);
-
-	while (argStr[j] != '\0')
+	str = va_arg(arguments, char *);
+	if (str == NULL)
 	{
-		i = 0;
-		while (alpha[i] != '\0')
+		for (i = 0; nill[i]; i++)
+			ibuf = handl_buf(buf, nill[i], ibuf);
+		return (6);
+	}
+	for (i = 0; str[i]; i++)
+	{
+		for (k = j = 0; alf[j]; j++)
 		{
-			if (argStr[j] == alpha[i])
+			if (str[i] == alf[j])
 			{
-				format[j] = code[i];
+				k = 1;
+				ibuf = handl_buf(buf, rot[j], ibuf);
 				break;
 			}
-			i++;
 		}
-		j++;
+		if (k == 0)
+			ibuf = handl_buf(buf, str[i], ibuf);
 	}
-	format = format + _strlen(argStr);
-	if (_strlen(formatEnd) > 2)
-		_strcpy(format, formatEnd + 2);
-	else
-		*format = '\0';
-	free(formatEnd);
-	return (format);
+	return (i);
 }
